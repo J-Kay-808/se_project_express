@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const User = require("./user");
 const validator = require("validator");
+const User = require("./user");
 
 // Define weather enum
 const weatherEnum = ['hot', 'warm', 'cold'];
@@ -22,8 +22,10 @@ const clothingItemSchema = new mongoose.Schema({
         type: String,
         required: true,
         validate: {
-            validator: (value) => validator.isURL(value),
-            message: "You must enter a valid URL",
+            validator(value) {
+                return validator.isURL(value);
+            },
+            message: 'You must enter a valid URL',
         },
     },
 
