@@ -68,9 +68,53 @@ const deleteItem = (req, res) => {
     });
 };
 
+// Controller to LIKE items
+const likeItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.send({ item }))
+    .catch((e) => {
+      if (e.name === "DocumentNotFoundError") {
+        return res.status(errorCode.idNotFound) .send({ message: errorMessage.idNotFound });
+      }
+      if (e.name === "CastError") {
+        return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
+      }
+      return res
+        .status(errorCode.defaultError)
+        .send({ message: errorMessage.defaultError });
+    });
+};
+
+
+// Controller to DISLIKE items
+const dislikeItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $pull: { likes: req.user._id } }, // remove _id from the array
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.send({ item }))
+    .catch((e) => {
+      if (e.name === "DocumentNotFoundError") {
+        return res.status(errorCode.idNotFound) .send({ message: errorMessage.idNotFound });
+      }
+      if (e.name === "CastError") {
+        return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
+      }
+      return res
+      (errorCode.defaultError)
+      .send({ message: errorMessage.defaultError });
+    });
+};
 
 
 
 module.exports = {
-   getItems, updateItem, createItem, deleteItem
-}
+  getItems, updateItem, createItem, deleteItem, likeItem, dislikeItem
+};

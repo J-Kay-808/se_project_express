@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
-const { createItem, getItems, updateItem, deleteItem } = require('../controllers/clothingItems')
+const { createItem, getItems, updateItem, deleteItem, likeItem,
+    dislikeItem, } = require('../controllers/clothingItems')
 
 //Crud
 
@@ -9,7 +10,7 @@ const { createItem, getItems, updateItem, deleteItem } = require('../controllers
 
 router.post('/', createItem);
 
-//reaD
+//Read
 
 router.get('/', getItems);
 
@@ -21,5 +22,12 @@ router.put('/:itemId',updateItem )
 
 router.delete('/:itemId', deleteItem )
 
+//likes
+
+router.put('/:itemId/likes',likeItem);
+
+//dislikes
+
+router.delete('/:itemId/likes',dislikeItem);
 
 module.exports = router
