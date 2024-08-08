@@ -29,13 +29,13 @@ const getItems = (req, res) => {
 
 // Controller to CREATE Item
 const createItem = (req, res) => {
-  console.log(req)
-  console.log(res)
+  // console.log(req)
+  // console.log(res)
 
   const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id }).then((item) => {
-    console.log(item)
+    // console.log(item)
     res.send({ data: item })
   }).catch((e) => {
     console.error(e);
@@ -57,11 +57,13 @@ const deleteItem = (req, res) => {
     .then((item) => res.send({ item }))
     .catch((e) => {
       if (e.name === "DocumentNotFoundError") {
-        res.status(errorCode.idNotFound) .send({ message: errorMessage.idNotFound });
+        return res.status(errorCode.idNotFound) .send({ message: errorMessage.idNotFound });
       }
+
       if (e.name === "CastError") {
         return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
       }
+
       return res
       .status(errorCode.defaultError)
       .send({ message: errorMessage.defaultError });

@@ -6,23 +6,23 @@ const { createItem, getItems, deleteItem, likeItem,
 
 
 
-//Create
+// Create
 
 router.post('/', createItem);
 
-//Read
+// Read
 
 router.get('/', getItems);
 
-//Delete
+// Delete
 
 router.delete('/:itemId', deleteItem);
 
-//Likes
+// Likes
 
 router.put('/:itemId/likes', likeItem);
 
-//Dislikes
+// Dislikes
 
 router.delete('/:itemId/likes', dislikeItem);
 
