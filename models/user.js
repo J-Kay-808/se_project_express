@@ -8,17 +8,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         minlength: 2,
-        maxlength: 30
+        maxlength: 30,
     },
     avatar: {
         type: String,
         required: true,
-        validator(value) {
-            return validator.isURL(value);
+        validate: {
+            validator(value) {
+                return validator.isURL(value);
+            },
+            message: "You must enter a valid URL",
         },
-        message: "You must enter a valid URL",
     },
-
 });
 
 // User Model

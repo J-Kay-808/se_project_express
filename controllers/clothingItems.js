@@ -14,18 +14,18 @@ const getItems = (req, res) => {
 };
 
 // Controller to get a item by ID
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
+// const updateItem = (req, res) => {
+//   const { itemId } = req.params;
+//   const { imageUrl } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.status(200).send({ data: item }))
-    .catch((e) => {
-      res.status(500).send({ message: "Error from updateItem", e });
-    });
+//   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
+//     .orFail()
+//     .then((item) => res.status(200).send({ data: item }))
+//     .catch((e) => {
+//       res.status(500).send({ message: "Error from updateItem", e });
+//     });
 
-}
+// }
 
 //// Controller to CREATE Item
 const createItem = (req, res) => {
@@ -36,7 +36,7 @@ const createItem = (req, res) => {
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id }).then((item) => {
     console.log(item)
-    res.send({ data: time })
+    res.send({ data: item })
   }).catch((e) => {
     console.error(e);
     if (e.name === "ValidationError") {
@@ -57,15 +57,15 @@ const deleteItem = (req, res) => {
     .then((item) => res.send({ item }))
     .catch((e) => {
       if (e.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: e.message });
+        res.status(errorCode.idNotFound) .send({ message: errorMessage.idNotFound });
       }
       if (e.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid Data" });
+        return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
       }
       return res
-        .status(DEFAULT)
-        .send({ message: "An error has occurred on the server" });
-    });
+      .status(errorCode.defaultError)
+      .send({ message: errorMessage.defaultError });
+  });
 };
 
 // Controller to LIKE items
@@ -116,5 +116,5 @@ const dislikeItem = (req, res) => {
 
 
 module.exports = {
-  getItems, updateItem, createItem, deleteItem, likeItem, dislikeItem
+  getItems, createItem, deleteItem, likeItem, dislikeItem
 };

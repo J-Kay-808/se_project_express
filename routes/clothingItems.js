@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const { createItem, getItems, updateItem, deleteItem, likeItem,
+const { createItem, getItems, deleteItem, likeItem,
     dislikeItem, } = require('../controllers/clothingItems')
 
 //Crud
@@ -16,7 +16,7 @@ router.get('/', getItems);
 
 //Update
 
-router.put('/:itemId',updateItem )
+// router.put('/:itemId',updateItem )
 
 //delete
 
