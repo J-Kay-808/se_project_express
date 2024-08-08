@@ -27,7 +27,7 @@ const getItems = (req, res) => {
 
 // }
 
-//// Controller to CREATE Item
+// Controller to CREATE Item
 const createItem = (req, res) => {
   console.log(req)
   console.log(res)
