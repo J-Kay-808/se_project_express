@@ -1,4 +1,4 @@
-const token = authorization.replace("Bearer ", "");
+const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require("../utils/config");
 const { errorCode, errorMessage } = require('../utils/errors');
 
