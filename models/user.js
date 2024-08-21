@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
+const { errorMessage } = require('../utils/errors');
 
 
 // User Schema
