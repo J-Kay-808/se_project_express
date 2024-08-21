@@ -21,9 +21,9 @@ const createUser = async (req, res) => {
       .send({ message: errorMessage.invalidEmail });
   }
   return User.findOne({ email })
-    .then((existingEmail) => {
-      if (existingEmail) {
-        throw new Error('Email already exists');
+    .then((existingUser) => {
+      if (existingUser) {
+        throw new Error('User already exists');
       }
       return bcrypt.hash(password, 10);
     })
