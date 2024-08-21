@@ -1,37 +1,11 @@
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
 const User = require('../models/user');
+
+const { JWT_SECRET } = require('../utils/config');
 const { errorCode, errorMessage } = require("../utils/errors");
 
-// Controller to get all users
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((e) => {
-      console.error(e);
-      return res.status(errorCode.defaultError).send({ message: errorMessage.defaultError });
-    });
-};
-
-
-// Controller to get a user by ID
-const getUser = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
-    .orFail()
-    .then((user) => res.status(200).send({ data: user }))
-    .catch((e) => {
-      console.error(e);
-      if (e.name === 'DocumentNotFoundError') {
-        return res.status(errorCode.idNotFound).send({ message: errorMessage.idNotFound });
-      } if (e.name === 'CastError') {
-        return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
-      }
-      return res.status(errorCode.defaultError).send({ message: errorMessage.defaultError });
-    });
-};
 
 // Controller to create a new user
 const createUser = async (req, res) => {
@@ -108,4 +82,54 @@ const login = (req, res) => {
     });
 };
 
-module.exports = { getUsers, getUser, createUser, login };
+
+// Controller to current user
+const getCurrentUser = (req, res) => {
+  const userId = req.user._id;
+  User.findById(userId)
+    .orFail()
+    .then((user) => res.send({ data: user }))
+    .catch((e) => {
+      console.error(e);
+      if (e.name === 'DocumentNotFoundError') {
+        return res
+          .status(errorCode.idNotFound)
+          .send({ message: errorMessage.idNotFound });
+      }
+      if (e.name === 'CastError') {
+        return res
+          .status(errorCode.invalidData)
+          .send({ message: errorMessage.invalidData });
+      }
+      return res
+        .status(errorCode.defaultError)
+        .send({ message: errorMessage.defaultError });
+    });
+};
+
+
+// Control to update user
+const updateUser = (req, res) => {
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name: req.body.name, avatar: req.body.avatar },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .orFail(() => new Error('DocumentNotFoundError'))
+    .then((updatedUser) => res.status(errorCode.ok).json({ data: updatedUser }))
+    .catch((e) => {
+      console.error(e);
+      if (e.name === 'ValidationError') {
+        return res.status(errorCode.invalidData).json({ message: errorMessage.validationError });
+      }
+      if (e.message === 'DocumentNotFoundError') {
+        return res.status(errorCode.idNotFound).json({ message: errorMessage.idNotFound });
+      }
+      return res.status(errorCode.defaultError).json({ message: errorMessage.defaultError });
+    });
+};
+
+module.exports = { createUser, login, getCurrentUser, updateUser };

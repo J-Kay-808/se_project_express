@@ -52,23 +52,41 @@ const createItem = (req, res) => {
 // Controller to DELETE item   
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-  ClothingItem.findByIdAndDelete(itemId)
+  const userId = req.user._id;
+  ClothingItem.findById(itemId)
     .orFail()
-    .then((item) => res.send({ item }))
+    .then((item) => {
+      if (item.owner.toString() !== userId) {
+        const error = new Error();
+        error.name = "Access Denied";
+        throw error;
+      }
+      return ClothingItem.findByIdAndRemove(itemId)
+    })
+    .then((item) => res.send(item))
     .catch((e) => {
-      if (e.name === "DocumentNotFoundError") {
-        return res.status(errorCode.idNotFound) .send({ message: errorMessage.idNotFound });
+      console.error(e);
+      if (e.name === "Access Denied") {
+        return res
+          .status(errorCode.accessDenied)
+          .send({ message: `${errorMessage.accessDenied} to delete this item` });
       }
-
-      if (e.name === "CastError") {
-        return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
+      if (e.name === "ValidationError" || e.name === 'CastError') {
+        return res
+          .status(errorCode.invalidData)
+          .send({ message: errorMessage.invalidData });
       }
-
+      if (e.name === 'DocumentNotFoundError') {
+        return res
+          .status(errorCode.idNotFound)
+          .send({ message: errorMessage.idNotFound });
+      }
       return res
-      .status(errorCode.defaultError)
-      .send({ message: errorMessage.defaultError });
-  });
+        .status(errorCode.defaultError)
+        .send({ message: errorMessage.defaultError });
+    });
 };
+
 
 // Controller to LIKE items
 const likeItem = (req, res) => {
@@ -81,7 +99,7 @@ const likeItem = (req, res) => {
     .then((item) => res.send({ item }))
     .catch((e) => {
       if (e.name === "DocumentNotFoundError") {
-        return res.status(errorCode.idNotFound) .send({ message: errorMessage.idNotFound });
+        return res.status(errorCode.idNotFound).send({ message: errorMessage.idNotFound });
       }
       if (e.name === "CastError") {
         return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
@@ -104,14 +122,14 @@ const dislikeItem = (req, res) => {
     .then((item) => res.send({ item }))
     .catch((e) => {
       if (e.name === "DocumentNotFoundError") {
-        return res.status(errorCode.idNotFound) .send({ message: errorMessage.idNotFound });
+        return res.status(errorCode.idNotFound).send({ message: errorMessage.idNotFound });
       }
       if (e.name === "CastError") {
         return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
       }
       return res
-      (errorCode.defaultError)
-      .send({ message: errorMessage.defaultError });
+        (errorCode.defaultError)
+        .send({ message: errorMessage.defaultError });
     });
 };
 
