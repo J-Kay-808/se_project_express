@@ -4,7 +4,7 @@ const { errorCode, errorMessage } = require('../utils/errors');
 
 // Controller to get ALL items
 const getItems = (req, res) => {
-  ClothingItem.find({}).then((items) => res.status(200).send(items))
+  ClothingItem.find({}).then((items) => res.send(items))
     .catch((e) => {
       console.error(e);
       return res
@@ -12,23 +12,6 @@ const getItems = (req, res) => {
         .send({ message: errorMessage.defaultError });
     });
 };
-
-// Controller to get a item by ID
-// const updateItem = (req, res) => {
-//   const { itemId } = req.params;
-//   const { imageUrl } = req.body;
-
-//   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-//     .orFail()
-//     .then((item) => res.status(200).send({ data: item }))
-//     .catch((e) => {
-//       res.status(500).send({ message: "Error from updateItem", e });
-//     });
-
-// }
-
-
-
 
 // Controller to CREATE Item
 const createItem = (req, res) => {
@@ -88,6 +71,26 @@ const deleteItem = (req, res) => {
     });
 };
 
+const updateItem = (req, res) => {
+  const { itemId } = req.params;
+  const { imageUrl } = req.body;
+
+  Item.findByIdAndUpdate(itemId, { $set: { imageUrl } })
+    .orFail()
+    .then((item) => res.send({ data: item }))
+    .catch((e) => {
+      console.error(e);
+      if (e.name === "ValidationError") {
+        return res
+          .status(errorCode.invalidData)
+          .send({ message: `${errorMessage.invalidData} from updateItem` });
+      }
+      return res
+        .status(errorCode.defaultError)
+        .send({ message: `${errorMessage.defaultError} from updateItem` });
+    });
+};
+
 
 // Controller to LIKE items
 const likeItem = (req, res) => {
@@ -137,5 +140,5 @@ const dislikeItem = (req, res) => {
 
 
 module.exports = {
-  getItems, createItem, deleteItem, likeItem, dislikeItem
+  getItems, createItem, deleteItem,updateItem, likeItem, dislikeItem
 };
