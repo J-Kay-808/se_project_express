@@ -71,25 +71,25 @@ const deleteItem = (req, res) => {
     });
 };
 
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
+// const updateItem = (req, res) => {
+//   const { itemId } = req.params;
+//   const { imageUrl } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.send({ data: item }))
-    .catch((e) => {
-      console.error(e);
-      if (e.name === "ValidationError") {
-        return res
-          .status(errorCode.invalidData)
-          .send({ message: `${errorMessage.invalidData} from updateItem` });
-      }
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: `${errorMessage.defaultError} from updateItem` });
-    });
-};
+//   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
+//     .orFail()
+//     .then((item) => res.send({ data: item }))
+//     .catch((e) => {
+//       console.error(e);
+//       if (e.name === "ValidationError") {
+//         return res
+//           .status(errorCode.invalidData)
+//           .send({ message: `${errorMessage.invalidData} from updateItem` });
+//       }
+//       return res
+//         .status(errorCode.defaultError)
+//         .send({ message: `${errorMessage.defaultError} from updateItem` });
+//     });
+// };
 
 
 // Controller to LIKE items
@@ -140,5 +140,5 @@ const dislikeItem = (req, res) => {
 
 
 module.exports = {
-  getItems, createItem, deleteItem,updateItem, likeItem, dislikeItem
+  getItems, createItem, deleteItem, likeItem, dislikeItem
 };
