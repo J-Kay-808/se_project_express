@@ -1,6 +1,6 @@
+const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const { JWT_SECRET } = require('../utils/config');
@@ -8,11 +8,11 @@ const { errorCode, errorMessage } = require("../utils/errors");
 
 
 // Controller to create a new user
-const createUser = async (req, res) => {
+const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email) {
-    return res.status(errorCode.invalidData).send({ message: errorMessage.invalidEmail })
+    return res.status(errorCode.invalidData).send({ message: errorMessage.requiredEmailAndPassword })
   }
 
   if (!validator.isEmail(email)) {
@@ -21,9 +21,9 @@ const createUser = async (req, res) => {
       .send({ message: errorMessage.invalidEmail });
   }
   return User.findOne({ email })
-    .then((existingUser) => {
-      if (existingUser) {
-        throw new Error('User already exists');
+    .then((existingEmail) => {
+      if (existingEmail) {
+        throw new Error('Email Exists');
       }
       return bcrypt.hash(password, 10);
     })
@@ -37,7 +37,7 @@ const createUser = async (req, res) => {
     )
     .catch((e) => {
       console.error(e);
-      if (e.message === 'This Email already Exists') {
+      if (e.message === 'Email Exists') {
         return res
           .status(errorCode.conflict)
           .send({ message: errorMessage.existEmail });

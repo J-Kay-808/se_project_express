@@ -27,27 +27,28 @@ const getItems = (req, res) => {
 
 // }
 
+
+
+
 // Controller to CREATE Item
 const createItem = (req, res) => {
-  // console.log(req)
-  // console.log(res)
-
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id }).then((item) => {
-    // console.log(item)
-    res.send({ data: item })
-  }).catch((e) => {
-    console.error(e);
-    if (e.name === "ValidationError") {
-      return res.status(errorCode.invalidData)
-        .send({ message: errorMessage.validationError });
-    }
-    return res
-      .status(errorCode.defaultError)
-      .send({ message: errorMessage.defaultError });
-  });
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
+    .then((item) => res.send({ data: item }))
+    .catch((e) => {
+      console.error(e);
+      if (e.name === 'ValidationError') {
+        return res
+          .status(errorCode.invalidData)
+          .send({ message: errorMessage.validationError });
+      }
+      return res
+        .status(errorCode.defaultError)
+        .send({ message: errorMessage.defaultError });
+    });
 };
+
 
 // Controller to DELETE item   
 const deleteItem = (req, res) => {
