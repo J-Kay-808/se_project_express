@@ -1,6 +1,6 @@
 {
   "name": "se_project_express",
-  "homepage": "http://J-Kay-808.github.io//se_project_express/",
+  "homepage": "https://github.com/J-Kay-808/se_project_express.git",
   "version": "1.0.0",
   "description": "The back-end project is focused on creating a server for the WTWR application. You’ll gain a deeper understanding of how to work with databases, set up security and testing, and deploy web applications on a remote machine. The eventual goal is to create a server with an API and user authorization.\r ## Running the Project\r `npm run start` — to launch the server",
   "main": "app.js",
