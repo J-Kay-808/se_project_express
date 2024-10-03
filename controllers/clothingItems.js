@@ -2,26 +2,15 @@ const ClothingItem = require('../models/clothingItem');
 const { errorCode, errorMessage } = require('../utils/errors');
 
 
-// Controller to get ALL items
-const getItems = (req, res) => {
-  ClothingItem.find({}).then((items) => res.send(items))
-    .catch((e) => {
-      console.error(e);
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
-    });
-};
-
 // Controller to CREATE Item
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => res.send({ data: item }))
-    .catch((e) => {
-      console.error(e);
-      if (e.name === 'ValidationError') {
+    .catch((err) => {
+      console.error(err);
+      if (err.name === 'ValidationError') {
         return res
           .status(errorCode.invalidData)
           .send({ message: errorMessage.validationError });
@@ -31,6 +20,19 @@ const createItem = (req, res) => {
         .send({ message: errorMessage.defaultError });
     });
 };
+
+
+// Controller to get ALL items
+const getItems = (req, res) => {
+  ClothingItem.find({}).then((items) => res.send(items))
+    .catch((err) => {
+      console.error(err);
+      return res
+        .status(errorCode.defaultError)
+        .send({ message: errorMessage.defaultError });
+    });
+};
+
 
 
 // Controller to DELETE item   
@@ -48,19 +50,19 @@ const deleteItem = (req, res) => {
       return ClothingItem.findByIdAndRemove(itemId)
     })
     .then((item) => res.send(item))
-    .catch((e) => {
-      console.error(e);
-      if (e.name === "Access Denied") {
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "Access Denied") {
         return res
           .status(errorCode.accessDenied)
           .send({ message: `${errorMessage.accessDenied} to delete this item` });
       }
-      if (e.name === "ValidationError" || e.name === 'CastError') {
+      if (err.name === "ValidationError" || err.name === 'CastError') {
         return res
           .status(errorCode.invalidData)
           .send({ message: errorMessage.invalidData });
       }
-      if (e.name === 'DocumentNotFoundError') {
+      if (err.name === 'DocumentNotFoundError') {
         return res
           .status(errorCode.idNotFound)
           .send({ message: errorMessage.idNotFound });
@@ -78,9 +80,9 @@ const deleteItem = (req, res) => {
 //   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
 //     .orFail()
 //     .then((item) => res.send({ data: item }))
-//     .catch((e) => {
-//       console.error(e);
-//       if (e.name === "ValidationError") {
+//     .catch((err) => {
+//       console.error(err);
+//       if (err.name === "ValidationError") {
 //         return res
 //           .status(errorCode.invalidData)
 //           .send({ message: `${errorMessage.invalidData} from updateItem` });
@@ -101,11 +103,11 @@ const likeItem = (req, res) => {
   )
     .orFail()
     .then((item) => res.send({ item }))
-    .catch((e) => {
-      if (e.name === "DocumentNotFoundError") {
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
         return res.status(errorCode.idNotFound).send({ message: errorMessage.idNotFound });
       }
-      if (e.name === "CastError") {
+      if (err.name === "CastError") {
         return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
       }
       return res
@@ -124,11 +126,11 @@ const dislikeItem = (req, res) => {
   )
     .orFail()
     .then((item) => res.send({ item }))
-    .catch((e) => {
-      if (e.name === "DocumentNotFoundError") {
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
         return res.status(errorCode.idNotFound).send({ message: errorMessage.idNotFound });
       }
-      if (e.name === "CastError") {
+      if (err.name === "CastError") {
         return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
       }
       return res

@@ -17,7 +17,7 @@ router.use(auth);
 
 // Create
 
-router.post('/', createItem);
+router.post('/', auth, createItem);
 
 
 // Delete
