@@ -12,8 +12,8 @@ router.post('/signup', createUser);
 router.use(auth);
 router.use('/users', userRouter);
 
-router.use((req, res) => {
-  res.status(errorCode.idNotFound).send({ message: errorMessage.idNotFound });
+router.use((req, res, next) => {
+  next(new NotFoundError("requested resource not found"));
 });
 
 module.exports = router;
