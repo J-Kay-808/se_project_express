@@ -36,42 +36,109 @@ const getItems = (req, res) => {
 
 
 // Controller to DELETE item   
+// const deleteItem = (req, res) => {
+//   const { itemId } = req.params;
+//   const userId = req.user._id;
+//   console.log('Item ID:', itemId);
+//   console.log('User ID:', userId);
+
+//   ClothingItem.findById(itemId)
+//     .orFail()
+//     .then((item) => {
+//       if (item.owner.toString() !== userId) {
+//         return res
+//         .status(FORBIDDEN)
+//         .send({ message: "You do not have permission to delete this item" });
+//     }
+
+//       return ClothingItem.findByIdAndDelete(itemId)
+//     })
+//     .then((item) => res.send(item))
+//     .catch((err) => {
+//       console.error(err);
+//       if (err.name === "Access Denied") {
+//         return res
+//           .status(errorCode.accessDenied)
+//           .send({ message: `${errorMessage.accessDenied} to delete this item` });
+//       }
+//       if (err.name === "ValidationError" || err.name === 'CastError') {
+//         return res
+//           .status(errorCode.invalidData)
+//           .send({ message: errorMessage.invalidData });
+//       }
+//       if (err.name === 'DocumentNotFoundError') {
+//         return res
+//           .status(errorCode.idNotFound)
+//           .send({ message: errorMessage.idNotFound });
+//       }
+//       return res
+//         .status(errorCode.defaultError)
+//         .send({ message: errorMessage.defaultError });
+//     });
+// };
+
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
   const userId = req.user._id;
+
+  // Log itemId and userId for debugging
+  console.log('Item ID:', itemId);
+  console.log('User ID:', userId);
+
+  // Find the item by its ID
   ClothingItem.findById(itemId)
-    .orFail()
-    .then((item) => {
-      if (item.owner.toString() !== userId) {
-        const error = new Error();
-        error.name = "Access Denied";
-        throw error;
-      }
-      return ClothingItem.findByIdAndRemove(itemId)
-    })
-    .then((item) => res.send(item))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "Access Denied") {
-        return res
-          .status(errorCode.accessDenied)
-          .send({ message: `${errorMessage.accessDenied} to delete this item` });
-      }
-      if (err.name === "ValidationError" || err.name === 'CastError') {
-        return res
-          .status(errorCode.invalidData)
-          .send({ message: errorMessage.invalidData });
-      }
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(errorCode.idNotFound)
-          .send({ message: errorMessage.idNotFound });
-      }
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
-    });
+      .then((item) => {
+          // Log the full item object to debug its structure
+          console.log('Item found:', item);
+
+          // If the item is not found, throw an error
+          if (!item) {
+              const error = new Error('Item not found');
+              error.name = 'ItemNotFound';
+              throw error;
+          }
+
+          // Check if the item has an owner property
+          if (!item.owner) {
+              const error = new Error('Owner not found for this item');
+              error.name = 'OwnerNotFound';
+              throw error;
+              
+          }
+          
+
+          // Compare the item's owner to the logged-in user's ID
+          if (item.owner.toString() !== userId) {
+              const error = new Error('Access Denied');
+              error.name = 'AccessDenied';
+              throw error;
+          }
+
+          // Proceed to delete the item
+          return ClothingItem.findByIdAndDelete(itemId);
+      })
+      .then((deletedItem) => {
+          // Send back the deleted item to confirm success
+          res.send(deletedItem);
+      })
+      .catch((err) => {
+          console.error('Error:', err);
+
+          // Handle specific errors and respond with proper messages and status codes
+          if (err.name === 'AccessDenied') {
+              return res.status(403).send({ message: 'You do not have permission to delete this item' });
+          }
+          if (err.name === 'ItemNotFound' || err.name === 'OwnerNotFound') {
+              return res.status(404).send({ message: 'Item or owner not found' });
+          }
+          
+          // Fallback for unexpected server errors
+          res.status(500).send({ message: 'An error occurred on the server' });
+      });
 };
+
+
+
 
 // const updateItem = (req, res) => {
 //   const { itemId } = req.params;
