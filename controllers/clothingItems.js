@@ -47,9 +47,11 @@ const deleteItem = (req, res) => {
     .then((item) => {
       if (item.owner.toString() !== userId) {
         return res
-        .status(FORBIDDEN)
-        .send({ message: "You do not have permission to delete this item" });
-    }
+          .status(errorCode.accessDenied)
+          .send({
+            message: errorMessage.accessDenied
+          })
+      }
 
       return ClothingItem.findByIdAndDelete(itemId)
     })
@@ -76,26 +78,6 @@ const deleteItem = (req, res) => {
         .send({ message: errorMessage.defaultError });
     });
 };
-
-// const updateItem = (req, res) => {
-//   const { itemId } = req.params;
-//   const { imageUrl } = req.body;
-
-//   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-//     .orFail()
-//     .then((item) => res.send({ data: item }))
-//     .catch((err) => {
-//       console.error(err);
-//       if (err.name === "ValidationError") {
-//         return res
-//           .status(errorCode.invalidData)
-//           .send({ message: `${errorMessage.invalidData} from updateItem` });
-//       }
-//       return res
-//         .status(errorCode.defaultError)
-//         .send({ message: `${errorMessage.defaultError} from updateItem` });
-//     });
-// };
 
 
 // Controller to LIKE items
@@ -142,57 +124,6 @@ const dislikeItem = (req, res) => {
         .send({ message: errorMessage.defaultError });
     });
 };
-
-// const likeItem = (req, res, next) => {
-//   ClothingItem.findByIdAndUpdate(
-//     req.params.itemId,
-//     { $addToSet: { likes: req.user._id } },
-//     { new: true }
-//   )
-//     .orFail()
-//     .then((item) => {
-//       res.send({ data: item });
-//     })
-//     .catch((err) => {
-//       console.error(`Error ${err.name} with message ${err.message}`);
-
-//       if (err.name === "DocumentNotFoundError") {
-//         return next(new NotFoundError("Document not found"));
-//       }
-//       if (err.name === "CastError") {
-//         return next(new BadRequestError("Invalid data entered"));
-//       }
-
-//       return next(err);
-//     });
-// };
-
-// const dislikeItem = (req, res, next) => {
-//   ClothingItem.findByIdAndUpdate(
-//     req.params.itemId,
-//     { $pull: { likes: req.user._id } },
-//     { new: true }
-//   )
-//     .orFail()
-//     .then((item) => {
-//       res.send({ data: item });
-//     })
-//     .catch((err) => {
-//       console.error(`Error ${err.name} with message ${err.message}`);
-
-//       if (err.name === "DocumentNotFoundError") {
-//         return next(new NotFoundError("Document not found"));
-//       }
-//       if (err.name === "CastError") {
-//         return next(new BadRequestError("Invalid data entered"));
-//       }
-
-//       return next(err);
-//     });
-// };
-
-
-
 
 module.exports = {
   getItems, createItem, deleteItem, likeItem, dislikeItem
