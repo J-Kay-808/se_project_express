@@ -4,8 +4,8 @@ const cors = require('cors');
 const { errors } = require("celebrate");
 require('dotenv').config();
 const { requestLogger, errorLogger } = require("./middlewares/logger");
-const errorHandler = require('./middlewares/error-handler')
 const indexRoute = require("./routes/index")
+const errorHandler = require('./middlewares/error-handler')
 
 
 const app = express();
