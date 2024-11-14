@@ -4,7 +4,7 @@ const { ForbiddenError } = require("../errors/ForbiddenError");
 const { BadRequestError } = require("../errors/BadRequestError");
 
 // Controller to CREATE Item
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
@@ -21,15 +21,13 @@ const createItem = (req, res) => {
 };
 
 // Controller to get ALL items
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({}).then((items) => res.send(items))
   .catch(next);
 };
 
-
-
 // Controller to DELETE item   
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
   console.log('Item ID:', itemId);
@@ -60,7 +58,7 @@ const deleteItem = (req, res) => {
 };
 
 // Controller to LIKE items
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
@@ -82,7 +80,7 @@ const likeItem = (req, res) => {
 
 
 // Controller to DISLIKE items
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } }, // remove _id from the array
