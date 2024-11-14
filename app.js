@@ -2,11 +2,11 @@ const express = require('express');
 const mongoose = require("mongoose");
 const cors = require('cors');
 const { errors } = require("celebrate");
+require('dotenv').config();
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const errorHandler = require('./middlewares/error-handler')
 const indexRoute = require("./routes/index")
 
-require('dotenv').config();
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -30,10 +30,11 @@ app.get('/crash-test', () => {
 app.use(requestLogger);
 app.use("/", indexRoute);
 
+app.use(errorLogger);
+
 app.use(errors());
 app.use(errorHandler);
 
-app.use(errorLogger);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

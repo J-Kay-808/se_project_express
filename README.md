@@ -7,5 +7,7 @@ Paying close attention to security and have thoroughly tested everything using P
 
 `npm run dev` — to launch the server with the hot reload feature
 
-### Testing
-Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+## **Domain**
+- **Name:**(https://wtwr.paranormal.com.my)	 
+
+**[Front-End Link](https://github.com/J-Kay-808/se_project_react)**

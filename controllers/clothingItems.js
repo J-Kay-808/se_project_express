@@ -1,6 +1,7 @@
 const ClothingItem = require('../models/clothingItem');
-const { errorCode, errorMessage } = require('../utils/errors');
-
+const { NotFoundError } = require("../errors/NotFoundError");
+const { ForbiddenError } = require("../errors/ForbiddenError");
+const { BadRequestError } = require("../errors/BadRequestError");
 
 // Controller to CREATE Item
 const createItem = (req, res) => {
@@ -8,29 +9,21 @@ const createItem = (req, res) => {
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => res.send({ data: item }))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === 'ValidationError') {
-        return res
-          .status(errorCode.invalidData)
-          .send({ message: errorMessage.validationError });
+    .catch((error) => {
+      if (error.name === "ValidationError") {
+        return next(new BadRequestError("Invalid data entered"));
       }
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
+      if (error.name === "CastError") {
+        return next(new BadRequestError("Invalid data entered"));
+      }
+      return next(error);
     });
 };
-
 
 // Controller to get ALL items
 const getItems = (req, res) => {
   ClothingItem.find({}).then((items) => res.send(items))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
-    });
+  .catch(next);
 };
 
 
@@ -46,11 +39,9 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== userId) {
-        return res
-          .status(errorCode.accessDenied)
-          .send({
-            message: errorMessage.accessDenied
-          })
+        throw new ForbiddenError(
+          "You do not have permission to delete this item"
+        );
       }
 
       return ClothingItem.findByIdAndDelete(itemId)
@@ -58,27 +49,15 @@ const deleteItem = (req, res) => {
     .then((item) => res.send(item))
     .catch((err) => {
       console.error(err);
-      if (err.name === "Access Denied") {
-        return res
-          .status(errorCode.accessDenied)
-          .send({ message: `${errorMessage.accessDenied} to delete this item` });
+      if (err.name === "DocumentNotFoundError") {
+        return next(new NotFoundError("Item not found"));
       }
-      if (err.name === "ValidationError" || err.name === 'CastError') {
-        return res
-          .status(errorCode.invalidData)
-          .send({ message: errorMessage.invalidData });
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid item ID"));
       }
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(errorCode.idNotFound)
-          .send({ message: errorMessage.idNotFound });
-      }
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
+      return next(err);
     });
 };
-
 
 // Controller to LIKE items
 const likeItem = (req, res) => {
@@ -90,15 +69,14 @@ const likeItem = (req, res) => {
     .orFail()
     .then((item) => res.send({ item }))
     .catch((err) => {
+      console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(errorCode.idNotFound).send({ message: errorMessage.idNotFound });
+        return next(new NotFoundError("Item not found"));
       }
       if (err.name === "CastError") {
-        return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
+        return next(new BadRequestError("Invalid item ID"));
       }
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
+      return next(err);
     });
 };
 
@@ -114,14 +92,12 @@ const dislikeItem = (req, res) => {
     .then((item) => res.send({ item }))
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
-        return res.status(errorCode.idNotFound).send({ message: errorMessage.idNotFound });
+        return next(new NotFoundError("Item not found"));
       }
       if (err.name === "CastError") {
-        return res.status(errorCode.invalidData).send({ message: errorMessage.invalidData });
+        return next(new BadRequestError("Invalid item ID"));
       }
-      return res
-        (errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
+      return next(err);
     });
 };
 

@@ -10,6 +10,9 @@ const {
 
 const auth = require('../middlewares/auth');
 
+const { validateClothingItem,
+    validateId } = require('../middlewares/validation')
+
 // Read
 router.get('/', getItems);
 
@@ -20,12 +23,12 @@ router.use(auth);
 
 // Create
 
-router.post('/', auth, createItem);
+router.post('/', validateClothingItem, createItem);
 
 
 // Delete
 
-router.delete('/:itemId', deleteItem);
+router.delete('/:itemId', validateId, deleteItem);
 
 // Update
 
@@ -33,10 +36,10 @@ router.delete('/:itemId', deleteItem);
 
 // Likes
 
-router.put('/:itemId/likes', likeItem);
+router.put('/:itemId/likes', validateId, likeItem);
 
 // Dislikes
 
-router.delete('/:itemId/likes', dislikeItem);
+router.delete('/:itemId/likes', validateId, dislikeItem);
 
 module.exports = router;
