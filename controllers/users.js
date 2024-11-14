@@ -109,8 +109,8 @@ const updateUser = (req, res, next) => {
       runValidators: true,
     }
   )
-    .orFail(() => new Error('DocumentNotFoundError'))
-    .then((updatedUser) => res.status(errorCode.ok).json({ data: updatedUser }))
+    .orFail() 
+    .then((updatedUser) => res.send(updatedUser))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
