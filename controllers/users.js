@@ -4,22 +4,24 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 const { JWT_SECRET } = require('../utils/config');
-const { errorCode, errorMessage } = require("../utils/errors");
 
+const { NotFoundError } = require("../errors/NotFoundError");
+const { BadRequestError } = require("../errors/BadRequestError");
+const { ConflictError } = require("../errors/ConflictError");
+const { UnauthorizedError } = require("../errors/UnauthorizedError");
 
 // Controller to create a new user
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email) {
-    return res.status(errorCode.invalidData).send({ message: errorMessage.requiredEmailAndPassword })
+    return next(new BadRequestError("Email is required"));
   }
 
   if (!validator.isEmail(email)) {
-    return res
-      .status(errorCode.invalidData)
-      .send({ message: errorMessage.invalidEmail });
+    return next(new BadRequestError("Invalid email format"));
   }
+
   return User.findOne({ email })
     .then((existingEmail) => {
       if (existingEmail) {
@@ -35,17 +37,17 @@ const createUser = (req, res) => {
         email: user.email,
       })
     )
-    .catch((e) => {
-      console.error(e);
-      if (e.message === 'Email Exists') {
-        return res
-          .status(errorCode.conflict)
-          .send({ message: errorMessage.existEmail });
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Invalid data provided"));
       }
-      if (e.name === 'ValidationError') {
-        return res.status(errorCode.invalidData).send({ message: errorMessage.validationError });
+      if (err.message === "Email already in use") {
+        return next(
+          new ConflictError("An account exists already with this email")
+        );
       }
-      return res.status(errorCode.defaultError).send({ message: errorMessage.defaultError });
+      return next(err);
     });
 };
 
@@ -54,15 +56,13 @@ const createUser = (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res
-      .status(errorCode.invalidData)
-      .send({ message: errorMessage.requiredEmailAndPassword });
+    return next(new BadRequestError("Invalid email or password"));
   }
+
   if (!validator.isEmail(email)) {
-    return res
-      .status(errorCode.invalidData)
-      .send({ message: errorMessage.invalidEmail });
+    return next(new BadRequestError("Invalid email format"));
   }
+
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -70,15 +70,12 @@ const login = (req, res) => {
       });
       return res.send({ token });
     })
-    .catch((e) => {
-      if (e.message === 'Incorrect email or password') {
-        return res
-          .status(errorCode.unauthorized)
-          .send({ message: errorMessage.incorrectEmailOrPassword });
+    .catch((err) => {
+      console.error(err);
+      if (err.message === "Incorrect email or password") {
+        return next(new UnauthorizedError("Invalid email or password"));
       }
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
+      return next(err);
     });
 };
 
@@ -89,21 +86,15 @@ const getCurrentUser = (req, res) => {
   User.findById(userId)
     .orFail()
     .then((user) => res.send({ data: user }))
-    .catch((e) => {
-      console.error(e);
-      if (e.name === 'DocumentNotFoundError') {
-        return res
-          .status(errorCode.idNotFound)
-          .send({ message: errorMessage.idNotFound });
+    .catch((err) => {
+      console.error(err);
+      if (err.name === 'DocumentNotFoundError') {
+        return next(new NotFoundError("Item not found"));
       }
-      if (e.name === 'CastError') {
-        return res
-          .status(errorCode.invalidData)
-          .send({ message: errorMessage.invalidData });
+      if (err.name === 'CastError') {
+        return next(new BadRequestError("Invalid data provided"));
       }
-      return res
-        .status(errorCode.defaultError)
-        .send({ message: errorMessage.defaultError });
+      return next(err);
     });
 };
 
@@ -120,15 +111,15 @@ const updateUser = (req, res) => {
   )
     .orFail(() => new Error('DocumentNotFoundError'))
     .then((updatedUser) => res.status(errorCode.ok).json({ data: updatedUser }))
-    .catch((e) => {
-      console.error(e);
-      if (e.name === 'ValidationError') {
-        return res.status(errorCode.invalidData).json({ message: errorMessage.validationError });
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Invalid data provided"));
       }
-      if (e.message === 'DocumentNotFoundError') {
-        return res.status(errorCode.idNotFound).json({ message: errorMessage.idNotFound });
+      if (err.name === "DocumentNotFoundError") {
+        return next(new NotFoundError("Item not found"));
       }
-      return res.status(errorCode.defaultError).json({ message: errorMessage.defaultError });
+      return next(err);
     });
 };
 
