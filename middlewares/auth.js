@@ -4,10 +4,6 @@ const { UnauthorizedError } = require("../errors/UnauthorizedError");
  
 
 
-const handleAuthError = (res) => {
-  res.status(errorCode.unauthorized).send({ message: errorMessage.authorizationRequired });
-};
-
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
@@ -19,7 +15,7 @@ const auth = (req, res, next) => {
 
   try {
     payload = jwt.verify(token, JWT_SECRET);
-  } catch (e) {
+  } catch (err) {
     console.error(err)
     return next(new UnauthorizedError("Unauthorized action"));
   }
