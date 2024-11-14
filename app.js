@@ -6,6 +6,8 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const errorHandler = require('./middlewares/error-handler')
 const indexRoute = require("./routes/index")
 
+require('dotenv').config();
+
 const app = express();
 const { PORT = 3001 } = process.env;
 
