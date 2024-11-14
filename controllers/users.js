@@ -11,7 +11,7 @@ const { ConflictError } = require("../errors/ConflictError");
 const { UnauthorizedError } = require("../errors/UnauthorizedError");
 
 // Controller to create a new user
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email) {
@@ -53,7 +53,7 @@ const createUser = (req, res) => {
 
 
 // Controller to Login
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return next(new BadRequestError("Invalid email or password"));
@@ -81,7 +81,7 @@ const login = (req, res) => {
 
 
 // Controller to current user
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
     .orFail()
@@ -100,7 +100,7 @@ const getCurrentUser = (req, res) => {
 
 
 // Control to update user
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name: req.body.name, avatar: req.body.avatar },
