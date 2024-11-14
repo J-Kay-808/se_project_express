@@ -5,10 +5,10 @@ const User = require('../models/user');
 
 const { JWT_SECRET } = require('../utils/config');
 
-const { NotFoundError } = require("../errors/NotFoundError");
-const { BadRequestError } = require("../errors/BadRequestError");
-const { ConflictError } = require("../errors/ConflictError");
-const { UnauthorizedError } = require("../errors/UnauthorizedError");
+const  NotFoundError  = require("../errors/NotFoundError");
+const  BadRequestError  = require("../errors/BadRequestError");
+const  ConflictError  = require("../errors/ConflictError");
+const  UnauthorizedError  = require("../errors/UnauthorizedError");
 
 // Controller to create a new user
 const createUser = (req, res, next) => {
@@ -42,7 +42,7 @@ const createUser = (req, res, next) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid data provided"));
       }
-      if (err.message === "Email already in use") {
+      if (err.message === "Email Exists") {
         return next(
           new ConflictError("An account exists already with this email")
         );

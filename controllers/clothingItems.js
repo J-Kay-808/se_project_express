@@ -1,7 +1,7 @@
 const ClothingItem = require('../models/clothingItem');
-const { NotFoundError } = require("../errors/NotFoundError");
-const { ForbiddenError } = require("../errors/ForbiddenError");
-const { BadRequestError } = require("../errors/BadRequestError");
+const NotFoundError = require("../errors/NotFoundError");
+const ForbiddenError = require("../errors/ForbiddenError");
+const BadRequestError = require("../errors/BadRequestError");
 
 // Controller to CREATE Item
 const createItem = (req, res, next) => {
@@ -23,7 +23,7 @@ const createItem = (req, res, next) => {
 // Controller to get ALL items
 const getItems = (req, res, next) => {
   ClothingItem.find({}).then((items) => res.send(items))
-  .catch(next);
+    .catch(next);
 };
 
 // Controller to DELETE item   

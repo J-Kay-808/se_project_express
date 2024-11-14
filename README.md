@@ -8,6 +8,6 @@ Paying close attention to security and have thoroughly tested everything using P
 `npm run dev` — to launch the server with the hot reload feature
 
 ## **Domain**
-- **Name:**(https://wtwr.paranormal.com.my)	 
+- **Name:**(https://api.wtwr.paranormal.com.my)	 
 
 **[Front-End Link](https://github.com/J-Kay-808/se_project_react)**
