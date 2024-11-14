@@ -10,4 +10,4 @@ Paying close attention to security and have thoroughly tested everything using P
 ## **Domain**
 - **Name:**(https://api.wtwr.paranormal.com.my)	 
 
-**[Front-End Link](https://github.com/J-Kay-808/se_project_react)**
+**[Front-End Link](https://api.wtwr.paranormal.com.my)**
